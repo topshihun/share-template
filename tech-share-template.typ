@@ -1,6 +1,8 @@
 // ============================================================
 //  tech-share-template.typ — 通用科技分享模板
 //
+//  License: MIT — Copyright (c) 2025 topshihun <topshihun@qq.com>
+//
 //  用法：
 //    #import "tech-share-template.typ": *
 //    #show: doc.with(title: "标题", author: "作者", date: datetime.today())
