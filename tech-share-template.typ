@@ -7,7 +7,7 @@
 //    #import "tech-share-template.typ": *
 //    #show: doc.with(title: "标题", author: "作者", date: datetime.today())
 //
-//  组件：tip, warn, info, col-list, cmds-table, steps
+//  组件：tip, warn, info, col-list, cmds-table, data-table, steps
 // ============================================================
 
 // ── 颜色 ──
@@ -108,6 +108,48 @@
     #if date != none { text(11pt, fill: rgb("#888888"))[#if author != none { [ · ] }#date] }
   ]
 
+  // 全局列表样式（set rules 在 doc 级别设置默认值）
+  set list(
+    marker: box(baseline: -0.13em)[
+      #text(fill: c2, size: 0.55em)[●]
+    ],
+    indent: 0.8em,
+    body-indent: 0.6em,
+  )
+  set enum(
+    numbering: n => text(weight: "bold", fill: c2, size: 1em)[#n.],
+    indent: 0.8em,
+    body-indent: 0.6em,
+  )
+
+  // 无序列表：外框 + 间距
+  show list: set par(first-line-indent: 0pt, leading: 0.7em)
+  show list: it => {
+    block(
+      fill: rgb("#FAFBFC"),
+      stroke: 0.5pt + rgb("#D5DCE6"),
+      inset: (x: 14pt, y: 10pt),
+      radius: 5pt,
+      width: 100%,
+      above: 0.5em,
+      below: 0.6em,
+    )[#it]
+  }
+
+  // 有序列表：外框 + 间距
+  show enum: set par(first-line-indent: 0pt, leading: 0.7em)
+  show enum: it => {
+    block(
+      fill: rgb("#FAFBFC"),
+      stroke: 0.5pt + rgb("#D5DCE6"),
+      inset: (x: 14pt, y: 10pt),
+      radius: 5pt,
+      width: 100%,
+      above: 0.5em,
+      below: 0.6em,
+    )[#it]
+  }
+
   body
 }
 
@@ -196,4 +238,47 @@
     [#{ i + 1 }. #item]
     if i < items.pos().len() - 1 { v(0.3em) }
   }
+}
+
+// ── 通用数据表格 ──
+// 用法：
+//   #data-table(
+//     columns: (auto, 1fr),
+//     header: ([名称], [说明]),
+//     [数字], [十进制数字],
+//     [+], [加法符号],
+//   )
+// 或使用 table-header 参数指定表头内容
+#let data-table(columns: auto, header: none, caption: none, ..rows) = {
+  // 构建表格的所有 positional arguments
+  let args = ()
+  if header != none {
+    for col in header {
+      args.push(text(weight: "bold", fill: white)[#col])
+    }
+  }
+  for r in rows.pos() {
+    args.push(r)
+  }
+
+  block(above: 0.6em, below: 0.8em)[
+    #if caption != none {
+      text(10.5pt, weight: "bold", fill: c3)[#caption]
+      v(0.35em)
+    }
+    #table(
+      columns: columns,
+      stroke: (x, y) => {
+        if y == 0 { (bottom: 1pt + c2, top: 1pt + c2) } else if y == 1 and header != none {
+          (bottom: 0.5pt + cbd)
+        } else { none }
+      },
+      inset: (x: 10pt, y: 6pt),
+      align: (center, left),
+      fill: (x, y) => {
+        if y == 0 { c2 } else if calc.rem(y, 2) == 0 { rgb("#F4F6FA") } else { none }
+      },
+      ..args,
+    )
+  ]
 }
